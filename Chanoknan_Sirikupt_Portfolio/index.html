@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chanoknan Sirikupt | Video Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+Thai:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F5F1FB;--ink:#2B1F4A;--text:#1E1734;--muted:#6E6686;--purple:#8B5CF6;--purple-d:#5B3FA0;--lav:#B79AE8;--pale:#E9DFFF;--r:24px;--shadow:0 24px 50px -28px rgba(91,63,160,.4)}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:88px}
+body{font-family:"Noto Sans Thai",Inter,system-ui,sans-serif;color:var(--text);line-height:1.65;min-height:100vh;overflow-x:hidden;background:radial-gradient(900px 600px at 0% -10%,#E9DFFF 0%,transparent 60%),radial-gradient(800px 700px at 100% 30%,#D9CCFA 0%,transparent 55%),var(--bg);background-attachment:fixed}
+img{max-width:100%;display:block}
+a{color:inherit}
+.wrap{width:min(1120px,92%);margin:auto;position:relative;z-index:1}
+:focus-visible{outline:3px solid var(--purple);outline-offset:3px;border-radius:10px}
+section{padding:clamp(3.5rem,8vw,6rem) 0}
+h1{font-size:clamp(2.3rem,5.4vw,4.2rem);line-height:1.12;font-weight:800;color:var(--ink);letter-spacing:-.02em;max-width:14ch}
+h2{font-size:clamp(1.7rem,4vw,2.5rem);font-weight:800;color:var(--ink);letter-spacing:-.01em;margin-bottom:.6rem}
+h3{font-size:1.05rem;font-weight:700;color:var(--ink);line-height:1.35}
+.ph{color:var(--muted);font-style:italic}
+.blob{position:fixed;border-radius:50%;filter:blur(70px);opacity:.55;pointer-events:none;z-index:0;animation:drift 18s ease-in-out infinite alternate}
+.b1{width:420px;height:420px;background:#C4B2F5;top:-120px;left:-120px}
+.b2{width:380px;height:380px;background:#E9DFFF;top:30%;right:-160px;animation-delay:-6s}
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.8rem 1.4rem;border-radius:999px;font:600 1rem inherit;text-decoration:none;border:1px solid #fff;cursor:pointer;transition:transform .25s,box-shadow .25s}
+.btn:hover{transform:translateY(-2px)}
+.btn-primary{background:linear-gradient(135deg,#A78BFA,#7C3AED);color:#fff;border-color:transparent;box-shadow:0 14px 30px -12px rgba(124,58,237,.6)}
+.btn-light{background:rgba(255,255,255,.7);color:var(--ink);backdrop-filter:blur(10px);box-shadow:0 12px 26px -16px rgba(91,63,160,.5)}
+.glass{background:rgba(255,255,255,.62);backdrop-filter:blur(18px) saturate(140%);border:1px solid #fff;border-radius:var(--r);box-shadow:var(--shadow)}
+.pill{display:inline-block;background:var(--pale);color:var(--purple-d);padding:.2rem .75rem;border-radius:999px;font-size:.8rem;font-weight:600}
+.sub{color:var(--muted);margin-bottom:1.6rem}
+
+/* Header */
+.hdr{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.6);backdrop-filter:blur(18px) saturate(150%);border-bottom:1px solid rgba(255,255,255,.95);box-shadow:0 8px 30px -18px rgba(91,63,160,.35)}
+.hdr .wrap{display:flex;align-items:center;justify-content:space-between;height:70px;gap:1rem}
+.mark{font-weight:800;color:var(--ink);text-decoration:none;white-space:nowrap}
+.mark span{color:var(--purple)}
+.nav{display:flex;align-items:center;gap:1.6rem}
+.nav a:not(.btn){text-decoration:none;color:var(--muted);font-weight:600;transition:color .2s}
+.nav a:not(.btn):hover{color:var(--ink)}
+.nav .btn{display:none}
+.right{display:flex;align-items:center;gap:.7rem}
+.lang{display:flex;background:rgba(255,255,255,.8);border:1px solid #fff;border-radius:999px;padding:3px}
+.lang button{background:none;border:0;color:var(--muted);padding:.3rem .7rem;border-radius:999px;cursor:pointer;font:600 .8rem Inter,sans-serif}
+.lang button[aria-pressed="true"]{background:linear-gradient(135deg,#A78BFA,#7C3AED);color:#fff}
+.menu-btn{display:none;background:rgba(255,255,255,.8);border:1px solid #fff;color:var(--ink);border-radius:12px;width:44px;height:44px;cursor:pointer;font-size:1.2rem;place-items:center}
+@media(max-width:820px){
+ .nav{display:none;position:absolute;top:70px;left:0;right:0;flex-direction:column;align-items:stretch;gap:1.1rem;background:rgba(255,255,255,.96);padding:1.2rem 4%;border-bottom:1px solid var(--pale);box-shadow:0 20px 40px -20px rgba(91,63,160,.35)}
+ .nav.open{display:flex}
+ .nav .btn{display:inline-flex;justify-content:center}
+ .menu-btn{display:grid}
+ .cta-hdr{display:none}
+}
+
+/* Hero */
+.hero{padding:clamp(3.5rem,9vw,6rem) 0 clamp(3rem,7vw,5rem)}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:3rem;align-items:center}
+.lead{color:var(--muted);font-size:1.12rem;max-width:50ch;margin:1.4rem 0 2rem}
+.btns{display:flex;gap:.8rem;flex-wrap:wrap}
+.portrait{position:relative;width:min(380px,100%);justify-self:center;padding:12px;border-radius:34px}
+.portrait img{width:100%;aspect-ratio:4/5;object-fit:cover;object-position:center top;border-radius:26px}
+.cap{position:absolute;left:24px;right:24px;bottom:24px;padding:.8rem 1.1rem;border-radius:18px;background:rgba(255,255,255,.8);backdrop-filter:blur(12px);border:1px solid #fff;display:flex;flex-direction:column}
+.cap strong{color:var(--ink);font-weight:800}
+.cap span{color:var(--muted);font-size:.88rem}
+.orb{position:absolute;width:110px;height:110px;border-radius:50%;top:-34px;right:-26px;background:radial-gradient(circle at 30% 28%,#fff 0%,#C9B6F7 30%,#8B5CF6 78%,#5B3FA0 100%);box-shadow:0 22px 40px -12px rgba(124,58,237,.55);animation:float 6s ease-in-out infinite;z-index:2}
+.ring{position:absolute;width:150px;height:150px;border:1.5px dashed rgba(139,92,246,.4);border-radius:50%;bottom:-40px;left:-40px;animation:spin 24s linear infinite}
+
+/* Work */
+.sec-h{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;margin-bottom:1.6rem}
+.chips{display:flex;gap:.5rem;flex-wrap:wrap}
+.chip{background:rgba(255,255,255,.7);border:1px solid #fff;color:var(--muted);padding:.45rem 1rem;border-radius:999px;cursor:pointer;font:600 .85rem Inter,"Noto Sans Thai",sans-serif;transition:all .2s}
+.chip:hover{color:var(--ink)}
+.chip[aria-pressed="true"]{background:linear-gradient(135deg,#A78BFA,#7C3AED);color:#fff;border-color:transparent}
+.feat{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.4rem;margin-bottom:4rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1.1rem}
+.card{background:linear-gradient(160deg,rgba(255,255,255,.92),rgba(255,255,255,.55));border:1px solid #fff;border-radius:var(--r);overflow:hidden;text-decoration:none;display:flex;flex-direction:column;box-shadow:var(--shadow);transition:transform .35s ease,box-shadow .35s ease}
+.card:hover,.card:focus-visible{transform:translateY(-6px);box-shadow:0 34px 60px -26px rgba(91,63,160,.55)}
+.thumb{position:relative;aspect-ratio:16/9;background:linear-gradient(135deg,#E9DFFF,#B79AE8);display:grid;place-items:center;overflow:hidden}
+.card.tt .thumb{aspect-ratio:4/5}
+.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s ease}
+.card:hover .thumb img{transform:scale(1.05)}
+.play{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.88);box-shadow:0 10px 24px -8px rgba(40,20,80,.5);display:grid;place-items:center;position:relative;transition:transform .3s,background .3s}
+.play::before{content:"";border-style:solid;border-width:9px 0 9px 15px;border-color:transparent transparent transparent var(--purple-d);margin-left:4px}
+.card:hover .play{transform:scale(1.1);background:#fff}
+.badge{position:absolute;top:12px;left:12px;background:rgba(255,255,255,.9);color:var(--ink);font-size:.72rem;font-weight:700;padding:.25rem .65rem;border-radius:999px}
+.body{padding:1rem 1.1rem 1.2rem;display:flex;flex-direction:column;gap:.4rem;flex:1}
+.meta{color:var(--muted);font-size:.8rem;font-weight:600}
+.desc{color:var(--muted);font-size:.9rem}
+.cta{margin-top:auto;color:var(--purple-d);font-weight:600;font-size:.88rem;padding-top:.4rem}
+.feat h3{font-size:1.15rem}
+
+/* About, services, experience */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;align-items:start}
+.panel{background:rgba(255,255,255,.66);backdrop-filter:blur(16px);border:1px solid #fff;border-radius:var(--r);padding:1.5rem;box-shadow:var(--shadow);transition:transform .3s}
+.panel:hover{transform:translateY(-3px)}
+.panel h3{margin-bottom:.4rem}
+.panel p{color:var(--muted)}
+.strengths{list-style:none;display:grid;gap:.65rem;color:var(--muted);margin-top:.8rem}
+.strengths li::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,#A78BFA,#7C3AED);margin-right:.7rem;vertical-align:middle}
+.svc{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.1rem}
+.stack{display:grid;gap:1rem}
+.job ul{list-style:none;margin-top:.6rem;display:grid;gap:.4rem;color:var(--muted);font-size:.95rem}
+.job li::before{content:"·";color:var(--purple);font-weight:800;margin-right:.5rem}
+
+/* Contact */
+.contact{background:linear-gradient(135deg,rgba(233,223,255,.95),rgba(255,255,255,.75));border:1px solid #fff;border-radius:30px;padding:clamp(2rem,6vw,4rem);text-align:center;box-shadow:var(--shadow)}
+.contact > p{color:var(--muted);margin:.8rem auto 1.6rem;max-width:50ch}
+.info{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin:1.8rem 0;text-align:left}
+.info .panel{padding:1.1rem 1.2rem}
+.info a{color:var(--purple-d);font-weight:600;text-decoration:none;word-break:break-word}
+.info a:hover{text-decoration:underline}
+.contact .ph{margin-top:1.2rem;font-size:.9rem}
+footer{padding:2rem 0;color:var(--muted);font-size:.9rem;position:relative;z-index:1}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;align-items:center;border-top:1px solid rgba(139,92,246,.2);padding-top:1.6rem}
+footer nav,#socials{display:flex;gap:1.2rem;flex-wrap:wrap}
+footer a{text-decoration:none;color:var(--muted)}
+footer a:hover{color:var(--ink)}
+
+/* Motion */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(40px,30px) scale(1.1)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:820px){.hero-grid,.two{grid-template-columns:1fr}.portrait{order:-1}.orb{width:84px;height:84px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}.reveal{opacity:1;transform:none}}
+
+/* Extra motion and decor */
+[hidden]{display:none!important}
+section{position:relative}
+.reveal{opacity:0;transform:translateY(40px);filter:blur(6px);transition:opacity 1.1s ease,transform 1.1s cubic-bezier(.2,.7,.2,1),filter 1.1s ease}
+.reveal.in{opacity:1;transform:none;filter:none}
+.card.in:hover{transform:translateY(-6px)}
+.panel.reveal.in:hover{transform:translateY(-3px)}
+.deco{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.di{position:absolute;display:block}
+.heart{width:34px;height:34px;fill:#f2ebf5;filter:drop-shadow(0 8px 12px rgba(243, 239, 245, 0.55));animation:heartBob 5s ease-in-out infinite}
+.spark{width:24px;height:24px;fill:#B79AE8;filter:drop-shadow(0 0 8px rgba(183,154,232,.8));animation:twinkle 3.2s ease-in-out infinite}
+.spark.big{width:42px;height:42px}
+.rg{position:absolute;border:1.5px solid rgba(183,154,232,.55);border-radius:50%;animation:spin 22s linear infinite}
+.rg::after{content:"";position:absolute;width:9px;height:9px;border-radius:50%;background:#ece2f5;top:-5px;left:50%;margin-left:-4.5px}
+.p1{top:10%;left:4%;animation-delay:-1s}.p2{top:22%;right:6%;animation-delay:-2.5s}.p3{top:62%;left:7%;animation-delay:-3.5s}.p4{top:74%;right:9%;animation-delay:-.5s}.p5{top:40%;right:3%;animation-delay:-4s}
+.deco.alt .p1{left:auto;right:6%}.deco.alt .p2{right:auto;left:8%}.deco.alt .p3{left:auto;right:10%}.deco.alt .p4{right:auto;left:12%}.deco.alt .p5{right:auto;left:2%}
+.r1{top:12%;right:10%;width:120px;height:120px}.r2{bottom:12%;left:5%;width:90px;height:90px}
+.deco.alt .r1{right:auto;left:6%}.deco.alt .r2{left:auto;right:6%}
+.more{display:flex;justify-content:center;margin-top:2rem}
+@keyframes heartBob{0%,100%{transform:translateY(0) rotate(-8deg) scale(1)}50%{transform:translateY(-18px) rotate(8deg) scale(1.08)}}
+@keyframes twinkle{0%,100%{transform:scale(.6) rotate(0deg);opacity:.4}50%{transform:scale(1.15) rotate(45deg);opacity:1}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="heart" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.1C.9 8.6 2.9 4.5 6.8 4.5c2.1 0 3.6 1.2 5.2 3 1.6-1.8 3.1-3 5.2-3 3.9 0 5.9 4.1 4.4 7.4C19.5 16.4 12 21 12 21z"/></symbol>
+  <symbol id="sparkle" viewBox="0 0 100 100"><path d="M50 0C55 40 60 45 100 50 60 55 55 60 50 100 45 60 40 55 0 50 40 45 45 40 50 0Z"/></symbol>
+</defs></svg>
+<div class="blob b1" aria-hidden="true"></div>
+<div class="blob b2" aria-hidden="true"></div>
+
+<header class="hdr">
+  <div class="wrap">
+    <a href="#top" class="mark">Chanoknan <span>Sirikupt</span></a>
+    <nav class="nav" id="nav" aria-label="Main">
+      <a href="#work" data-i18n="nav_work">Work</a>
+      <a href="#about" data-i18n="nav_about">About</a>
+      <a href="#contact" data-i18n="nav_contact">Contact</a>
+      <a href="#contact" class="btn btn-primary" data-i18n="cta">Let’s work together</a>
+    </nav>
+    <div class="right">
+      <div class="lang" role="group" aria-label="Language">
+        <button type="button" data-lang="th" aria-pressed="false">TH</button>
+        <button type="button" data-lang="en" aria-pressed="true">EN</button>
+      </div>
+      <a href="#contact" class="btn btn-primary cta-hdr" data-i18n="cta">Let’s work together</a>
+      <button type="button" class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="nav" aria-label="Open menu">☰</button>
+    </div>
+  </div>
+</header>
+
+<main>
+<section class="hero" id="top">
+  <div class="deco" aria-hidden="true">
+    <svg class="di heart p1" viewBox="0 0 24 24"><use href="#heart"/></svg>
+    <svg class="di spark big p2" viewBox="0 0 100 100"><use href="#sparkle"/></svg>
+    <svg class="di heart p3" viewBox="0 0 24 24"><use href="#heart"/></svg>
+    <svg class="di spark p4" viewBox="0 0 100 100"><use href="#sparkle"/></svg>
+    <svg class="di spark p5" viewBox="0 0 100 100"><use href="#sparkle"/></svg>
+    <span class="rg r1"></span><span class="rg r2"></span>
+  </div>
+  <div class="wrap hero-grid">
+    <div class="reveal">
+      <h1 data-i18n="hero_h1">Chanoknan Sirikupt</h1>
+      <p class="lead" data-i18n="hero_p">I edit videos with a focus on story, rhythm, and visual detail. Explore selected projects below.</p>
+      <div class="btns">
+        <a href="#work" class="btn btn-primary" data-i18n="btn_work">View my work</a>
+        <a href="#contact" class="btn btn-light" data-i18n="btn_contact">Contact me</a>
+      </div>
+    </div>
+    <figure class="portrait glass reveal">
+      <span class="orb" aria-hidden="true"></span>
+      <span class="ring" aria-hidden="true"></span>
+      <img src="assets/portrait.png" alt="Portrait of Chanoknan Sirikupt, video editor" width="477" height="440">
+      <figcaption class="cap"><strong>Video Editor</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="work">
+  <div class="deco alt" aria-hidden="true">
+    <svg class="di heart p1" viewBox="0 0 24 24"><use href="#heart"/></svg>
+    <svg class="di spark big p2" viewBox="0 0 100 100"><use href="#sparkle"/></svg>
+    <svg class="di heart p3" viewBox="0 0 24 24"><use href="#heart"/></svg>
+    <svg class="di spark p4" viewBox="0 0 100 100"><use href="#sparkle"/></svg>
+    <svg class="di spark p5" viewBox="0 0 100 100"><use href="#sparkle"/></svg>
+    <span class="rg r1"></span><span class="rg r2"></span>
+  </div>
+  <div class="wrap">
+    <div class="sec-h"><h2 data-i18n="feat_h">Featured work</h2></div>
+    <div class="feat" id="featGrid"></div>
+    <div class="sec-h">
+      <h2 data-i18n="all_h">All projects</h2>
+      <div class="chips" role="group" aria-label="Filter">
+        <button type="button" class="chip" data-filter="all" aria-pressed="true" data-i18n="f_all">All</button>
+        <button type="button" class="chip" data-filter="yt" aria-pressed="false" data-i18n="f_yt">YouTube</button>
+        <button type="button" class="chip" data-filter="tt" aria-pressed="false" data-i18n="f_tt">TikTok</button>
+      </div>
+    </div>
+    <div class="grid" id="workGrid"></div>
+    <div class="more"><button type="button" class="btn btn-light" id="moreBtn" aria-controls="workGrid" aria-expanded="false" hidden></button></div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="deco" aria-hidden="true">
+    <svg class="di heart p1" viewBox="0 0 24 24"><use href="#heart"/></svg>
+    <svg class="di spark big p2" viewBox="0 0 100 100"><use href="#sparkle"/></svg>
+    <svg class="di heart p3" viewBox="0 0 24 24"><use href="#heart"/></svg>
+    <svg class="di spark p4" viewBox="0 0 100 100"><use href="#sparkle"/></svg>
+    <svg class="di spark p5" viewBox="0 0 100 100"><use href="#sparkle"/></svg>
+    <span class="rg r1"></span><span class="rg r2"></span>
+  </div>
+  <div class="wrap two">
+    <div class="reveal">
+      <h2 data-i18n="about_h">About</h2>
+      <p class="lead" style="margin-top:1rem" data-i18n="about_p">Video editor and multimedia producer.</p>
+    </div>
+    <div class="panel reveal">
+      <h3 data-i18n="strength_h">Strengths and working style</h3>
+      <ul class="strengths">
+        <li data-i18n="s1"></li><li data-i18n="s2"></li><li data-i18n="s3"></li><li data-i18n="s4"></li><li data-i18n="s5"></li>
+      </ul>
+      <p class="meta-line" style="margin-top:1.2rem;color:var(--muted)"><strong style="color:var(--ink)" data-i18n="lang_h">Languages</strong> · <span data-i18n="lang_v">Thai (native), English (professional working proficiency)</span></p>
+    </div>
+  </div>
+</section>
+
+<section id="services">
+  <div class="deco alt" aria-hidden="true">
+    <svg class="di heart p1" viewBox="0 0 24 24"><use href="#heart"/></svg>
+    <svg class="di spark big p2" viewBox="0 0 100 100"><use href="#sparkle"/></svg>
+    <svg class="di heart p3" viewBox="0 0 24 24"><use href="#heart"/></svg>
+    <svg class="di spark p4" viewBox="0 0 100 100"><use href="#sparkle"/></svg>
+    <svg class="di spark p5" viewBox="0 0 100 100"><use href="#sparkle"/></svg>
+    <span class="rg r1"></span><span class="rg r2"></span>
+  </div>
+  <div class="wrap">
+    <h2 data-i18n="services_h">Services</h2>
+    <p class="sub" data-i18n="services_sub">Editing services and what they include.</p>
+    <div class="svc">
+      <div class="panel reveal"><h3 data-i18n="svc_video">Video editing</h3><p data-i18n="svc_video_d"></p></div>
+      <div class="panel reveal"><h3 data-i18n="svc_short">Short-form content</h3><p data-i18n="svc_short_d"></p></div>
+      <div class="panel reveal"><h3 data-i18n="svc_social">Social media video</h3><p data-i18n="svc_social_d"></p></div>
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="deco" aria-hidden="true">
+    <svg class="di heart p1" viewBox="0 0 24 24"><use href="#heart"/></svg>
+    <svg class="di spark big p2" viewBox="0 0 100 100"><use href="#sparkle"/></svg>
+    <svg class="di heart p3" viewBox="0 0 24 24"><use href="#heart"/></svg>
+    <svg class="di spark p4" viewBox="0 0 100 100"><use href="#sparkle"/></svg>
+    <svg class="di spark p5" viewBox="0 0 100 100"><use href="#sparkle"/></svg>
+    <span class="rg r1"></span><span class="rg r2"></span>
+  </div>
+  <div class="wrap two">
+    <div>
+      <h2 data-i18n="exp_h">Experience</h2>
+      <div class="stack" style="margin-top:1.4rem">
+        <article class="panel job reveal">
+          <span class="pill" data-i18n="job1_d">Apr 2026 – Present</span>
+          <h3 style="margin-top:.7rem"><span data-i18n="job1_t">Video Editor</span> · <span data-i18n="job1_co">Tang Makkaporn</span></h3>
+          <ul><li data-i18n="job1_b1"></li><li data-i18n="job1_b2"></li><li data-i18n="job1_b3"></li></ul>
+          <div class="panel"><h3 data-i18n="avail_h">Availability</h3><span data-i18n="avail_v">30 days notice required.</span></div>
+
+        </article>
+        <article class="panel job reveal">
+          <span class="pill" data-i18n="job2_d">Aug 2025 – Apr 2026</span>
+          <h3 style="margin-top:.7rem"><span data-i18n="job2_t">Content Creator</span> · <span data-i18n="job2_co">TSL Asia Seri Media &amp; KenBKK</span></h3>
+          <ul><li data-i18n="job2_b1"></li><li data-i18n="job2_b2"></li></ul>
+        </article>
+      </div>
+    </div>
+    <div>
+      <h2 data-i18n="edu_h">Education</h2>
+      <div class="stack" style="margin-top:1.4rem">
+        <article class="panel job reveal">
+          <h3 data-i18n="edu1_t">Bachelor of Information and Communication Technology</h3>
+          <p style="margin-top:.3rem" data-i18n="edu1_co">Silpakorn University · GPA 3.39</p>
+          <ul><li data-i18n="edu1_b"></li></ul>
+        </article>
+        <article class="panel job reveal">
+          <h3 data-i18n="edu2_t">Communication Art</h3>
+          <p style="margin-top:.3rem" data-i18n="edu2_co">Satri Rachinuthit School · GPA 3.51</p>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="deco alt" aria-hidden="true">
+    <svg class="di heart p1" viewBox="0 0 24 24"><use href="#heart"/></svg>
+    <svg class="di spark big p2" viewBox="0 0 100 100"><use href="#sparkle"/></svg>
+    <svg class="di heart p3" viewBox="0 0 24 24"><use href="#heart"/></svg>
+    <svg class="di spark p4" viewBox="0 0 100 100"><use href="#sparkle"/></svg>
+    <svg class="di spark p5" viewBox="0 0 100 100"><use href="#sparkle"/></svg>
+    <span class="rg r1"></span><span class="rg r2"></span>
+  </div>
+  <div class="wrap">
+    <div class="contact reveal">
+      <h2 data-i18n="contact_h">Let’s talk.</h2>
+      <p data-i18n="contact_p">Tell me about your video and your goals.</p>
+      <div class="info">
+        <div class="panel"><h3 data-i18n="email_h">Email</h3><a id="emailLink" href="#contact">chanoknansirikupt@gmail.com</a></div>
+        <div class="panel"><h3 data-i18n="phone_h">Phone</h3><a href="tel:0960799268">096-079-9268</a></div>
+        <div class="panel"><h3 data-i18n="line_h">Line</h3><span data-i18n="line_v">Days.17</span></div>
+      </div>
+      <a href="#contact" id="emailBtn" class="btn btn-primary" data-i18n="contact_email">Email me</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span data-i18n="footer_name">© 2026 Chanoknan Sirikupt. All rights reserved.</span>
+    <nav aria-label="Footer">
+      <a href="#work" data-i18n="nav_work">Work</a>
+      <a href="#about" data-i18n="nav_about">About</a>
+      <a href="#contact" data-i18n="nav_contact">Contact</a>
+    </nav>
+    <div id="socials"></div>
+  </div>
+</footer>
+
+<script>
+/* ============ CONFIG ============ */
+const CONFIG = {
+  email: "chanoknansirikupt@gmail.com",
+  social: { YouTube: "", TikTok: "", Instagram: "" }
+};
+
+/* ============ DATA ============
+   YT: [videoId, title, creator, featured 1/0]. Titles for some entries are in TITLES below.
+   TT: handle -> comma-separated video IDs. Thumbnails for dr.tangmakkaporn load from assets/tt1.jpg ... tt20.jpg in list order. */
+const YT = [
+  ["fOAWvQrh4_c", '"Where the Dead Sink" คดีสยองอิหร่าน บ่อน้ำผีสิงหรือแท้จริงคือคน | เวรชันสูตร Ep.385', "Tang Makkaporn", 1],
+  ["hrSUf3dZ-ns", '"Unlucky Man Case" คดีชายอับโชค ใครอยู่ข้างกายตายทุกคน | เวรชันสูตร Ep.377', "Tang Makkaporn", 1],
+  ["SkXJD914GGQ", '"Unlucky Man Case" คดีชายอับโชค ใครอยู่ข้างกายตายทุกคน | เวรชันสูตร Ep.377', "Tang Makkaporn", 0],
+  ["3heweb-790c", '"Mama’s Boy Case" คดีแม่สามีมหาภัยดับชีวิตลูกสะใภ้เส้นรักอำมหิต | เวรชันสูตร Ep.371', "Tang Makkaporn", 1],
+  ["57HE3KZi_tg", '"Korea bloody bath" คดีโหดอ่างมรณะคร่า 2 ศพ | เวรชันสูตร Ep.366', "Tang Makkaporn", 0],
+  ["qVqK0wpJbTo", '"Park Myung Sik Case" คดีดังเกาหลีเหนือ ตามล่า ตามหา ใครกันนะควักเครื่องใน | เวรชันสูตร Ep.361', "Tang Makkaporn", 1],
+  ["CPioMfN39KY", '"Carbon Monoxide" ควันพลางความตายแม่ลูกในบ้าน 80 ล้าน | เวรชันสูตร Ep.357', "Tang Makkaporn", 0],
+  ["q4Hj-m-lkNE", '"Rooftop Autopsy" คดีดาดฟ้าชั้น 15 นักศึกษาแพทย์สั่งตาย | เวรชันสูตร Ep.355', "Tang Makkaporn", 1],
+  ["51TLIKe6WO0", '"Justice Delayed Case" ฮีโร่หรือปีศาจคร่าเด็ดขาดเหยื่อ 14 รายที่ชานซี " | เวรชันสูตร Ep.353', "Tang Makkaporn", 0],
+  ["kkQE0v6aJ6Q", '"Rosie Ruiz" มหากาพย์กลโกงโลกมาราธอน | เรื่องโหดโหมดกีฬา Ep.4', "All Elite Players", 1],
+  ["kEerHKcgsSA", '"Kim Duk Koo" นักชกดุดัน สู้สุดฝันในไฟต์มรณะ | เรื่องโหดโหมดกีฬา Ep.3', "All Elite Players", 0],
+  ["_9eYqPJLkuE", '"Sohn Kee-chung" นักวิ่งมาราธอนล่าฝันสู่วันเสรี | เรื่องโหดโหมดกีฬา Ep.2', "All Elite Players", 0],
+  ["pSPmHg1Gm0U", '"Robert Rozier Case" นักอเมริกันฟุตบอลคลั่ง คร่าเดือด ลัทธิเถื่อนสุดโต่ง | เรื่องโหดโหมดกีฬา Ep.1', "All Elite Players", 0],
+  ["TshpXJUI9kQ", '"World Cup 2002" ปีแห่งปาฏิหาริย์ และเรื่องอื้อฉาว | Rematch Rerun Ep.2', "All Elite Players", 0],
+  ["DMObp4TJqEM", '"World Cup 1930" ฟุตบอลโลกครั้งแรก โหด ดิบ เถื่อน | Rematch Rerun Ep.1', "All Elite Players", 0],
+  ["-YFduTtDkEs", "", "Doctor AE Story", 0],
+  ["5_mlf_ApBm8", "", "Doctor AE Story", 0],
+  ["B5q1OzX-AkY", "", "Doctor AE Story", 0],
+  ["MkEqA3D_IxQ", "", "Doctor AE Story", 0],
+  ["Y11WIbKyA84", "", "Doctor AE Story", 0],
+  ["dWv4Ri0UuFY", "", "Doctor AE Story", 0],
+  ["wth1k2sixOA", "", "Doctor AE Story", 0],
+  ["ZTe6jtuklrc", "", "KenBKK", 0]
+];
+
+const TT = {
+  "dr.tangmakkaporn": "7690423952040070420,7691627558957337857,7686832016075263252,7686467703921528084,7685608198224497940,7683886247278054677,7680911218801986836,7677551995527384340,7669761128196574484,7666434888714980628,7665690111236918549,7657494653368847636,7656763289715690772,7646751986368449812,7646035426914127124,7645251547630275860,7644888145435184405,7637464277456293140,7632306366027189524,7627447506791648533",
+  "ken_bkk": "7641089199830994177,7636317336747756817,7634813945706024209,7633789019461078289,7621141533995060497,7620397062370102544,7613350494286662929,7605547352300031249,7604815922750098705,7600714277066001680,7596185130557902096,7591815586208910612,7588107224199826708,7580380733458468097,7579256593808706817,7572864017446866177,7566620930718305553,7566219911664536833,7565528348810562817,7563271572769737985,7556210534585011457,7554752301148392721,7554669271868083457,7543550771430804737,7542131162941099280",
+  "bas_bkk": "7607860471609167105,7615575731883560208,7616657147400686865,7618185451853204753,7618506639489944848,7619973885777251601,7621104126935485697,7621508203326590224,7621856198739938576,7621892373940817169,7623331145916124417,7619609330727341329"
+};
+
+
+/* Titles supplied for YouTube entries that had none in the first list */
+const TITLES = {
+  "-YFduTtDkEs": "3 อยาก 3 แบบ 3 เสร็จ ความมหัศจรรย์ของผู้หญิง | Doctor AE Story EP.14",
+  "5_mlf_ApBm8": "เครื่องปั๊มน้องชาย ใช้แล้วใหญ่? | SEXLAB EP.65",
+  "B5q1OzX-AkY": "Cock Ring ใช้ทางการแพทย์อย่างไรบ้าง? | Doctor AE Story EP.13",
+  "MkEqA3D_IxQ": "ฮอร์โมนเล่นกล้ามใช้อย่างไร? ปลอดภัยที่สุด | SEXLAB EP.61",
+  "Y11WIbKyA84": "วัยรุ่นนกเขาไม่ขัน สาเหตุและการแก้ไข | SEXLAB EP.63",
+  "dWv4Ri0UuFY": "สอดใส่ไม่ได้ รักษาได้ | SEXLAB EP.59",
+  "wth1k2sixOA": "PT-141 เปปไทด์กระตุ้นอารมณ์ทางเพศ มาแทนยาไวอากร้าได้จริงหรือ? | Doctor AE Story EP.12",
+  "ZTe6jtuklrc": "ปะทะสุนัข K9! | กองกำกับการสุนัขตำรวจ"
+};
+
+/* ============ TEXT ============ */
+const T = {
+  en: {
+    nav_work:"Work", nav_about:"About", nav_contact:"Contact", cta:"Let’s work together",
+    hero_h1:"Chanoknan Sirikupt",
+    hero_p:"I edit videos with a focus on story, rhythm, and visual detail. Explore selected projects below.",
+    btn_work:"View my work", btn_contact:"Contact me", role:"Video Editor",
+    feat_h:"Featured work", all_h:"All projects", f_all:"All", f_yt:"YouTube", f_tt:"TikTok",
+    watch_yt:"Watch on YouTube", watch_tt:"Watch on TikTok", ext:"(opens in a new tab)",
+    ph_title:"Project title", ph_desc:"Add a short description", menu:"Open menu", more:"Show more", less:"Show less",
+    about_h:"About", about_p:"Video editor and multimedia producer with hands-on experience in long-form YouTube editing, true-crime and podcast storytelling, and short-form TikTok content. I handle post-production workflows on my own, from case research and archive footage to audio mixing.",
+    strength_h:"Strengths and working style",
+    s1:"Solo post-production: research, editing and final cut.",
+    s2:"Long-form storytelling with careful pacing and archive footage.",
+    s3:"Short-form edits with strong hooks. One TikTok campaign reached over 2M views.",
+    s4:"Client work from brief to delivery, including shoot scheduling and post-production.",
+    s5:"Tools: Premiere Pro, After Effects, CapCut, Photoshop.",
+    services_h:"Services", services_sub:"Editing services and what they include.",
+    svc_video:"Video editing", svc_video_d:"Long-form video editing with careful pacing and archive footage.",
+    svc_short:"Short-form content", svc_short_d:"Short-form video editing with strong visual hooks.",
+    svc_social:"Social media video", svc_social_d:"Content for YouTube, TikTok, Facebook, and Instagram.",
+    exp_h:"Experience", edu_h:"Education",
+    job1_d:"Apr 2026 – Present", job1_t:"Video Editor", job1_co:"Tang Makkaporn",
+    job1_b1:"Full post-production for YouTube true-crime podcast",
+    job1_b2:"Solo editing for 6 episodes of All Elite Players: pacing, audio mixing, and archive footage.",
+    job1_b3:"Short-form TikTok edits with hooks in the first few seconds.",
+    job2_d:"Aug 2025 – Apr 2026", job2_t:"Content Creator", job2_co:"TSL Asia Seri Media & KenBKK",
+    job2_b1:"Produced and edited content for YouTube, TikTok, Facebook, and Instagram.",
+    job2_b2:"Directed projects end to end: client liaison, shoot scheduling, and post-production briefs.",
+    edu1_t:"Bachelor of Information and Communication Technology", edu1_co:"Silpakorn University · GPA 3.39",
+    edu1_b:"Thesis: short film Director.",
+    edu2_t:"Communication Art", edu2_co:"Satri Rachinuthit School · GPA 3.51",
+    contact_h:"Let’s talk.", contact_p:"Tell me about your video and your goals.",
+    email_h:"Email", phone_h:"Phone", line_h:"Line", line_v:"Days.17", lang_h:"Languages",
+    lang_v:"Thai (native), English (working proficiency)",
+    avail_h:"Availability", avail_v:"30 days notice required.", contact_email:"Email me",
+    footer_name:"© 2026 Chanoknan Sirikupt. All rights reserved."
+  },
+  th: {
+    nav_work:"ผลงาน", nav_about:"เกี่ยวกับฉัน", nav_contact:"ติดต่อ", cta:"มาร่วมงานกันเถอะ",
+    hero_h1:"ชนกนันท์ ศิริคุปต์",
+    hero_p:"ฉันตัดต่อวิดีโอโดยให้ความสำคัญกับเรื่องราว จังหวะ และรายละเอียดของภาพ ดูผลงานที่คัดสรรไว้ด้านล่างได้เลย",
+    btn_work:"ดูผลงาน", btn_contact:"ติดต่อฉัน", role:"Video Editor",
+    feat_h:"ผลงานเด่น", all_h:"ผลงานทั้งหมด", f_all:"ทั้งหมด", f_yt:"YouTube", f_tt:"TikTok",
+    watch_yt:"ดูบน YouTube", watch_tt:"ดูบน TikTok", ext:"(เปิดในแท็บใหม่)",
+    ph_title:"ชื่อโปรเจกต์", ph_desc:"เพิ่มคำอธิบายสั้น ๆ", menu:"เปิดเมนู", more:"ดูเพิ่มเติม", less:"ย่อลง",
+    about_h:"เกี่ยวกับฉัน", about_p:"ตัดต่อวิดีโอ มีประสบการณ์ตัดต่อ Long form videos บน YouTube เล่าเรื่องแนวอาชญากรรมและพอดแคสต์ และตัดต่อ Short form videos บน TikTok ฉันดูแล Post-production ตั้งแต่ค้นคว้าข้อมูลและหาฟุตเทจอ้างอิงเพิ่มเติม ไปจนถึงการตัดต่อ",
+    strength_h:"จุดแข็ง",
+    s1:"ทำงาน Post-production ด้วยตัวเอง ตั้งแต่ค้นคว้าข้อมูลของเนื้อหาเพิ่มเติม การตัดต่อ การมิกซ์เสียง",
+    s2:"เล่าเรื่องแบบ Long-form ใช้ฟุตเทจอ้างอิงให้เข้ากับเนื้อหา",
+    s3:"ตัดคลิปสั้นที่มีฮุกดึงดูดตั้งแต่ต้น แคมเปญ TikTok มียอดวิวเกิน 2 ล้านครั้ง",
+    s4:"ทำงานร่วมกับลูกค้า ตั้งแต่รับโจทย์ วางแผนถ่ายทำ จนถึงงานหลังการผลิต",
+    s5:"โปรแกรมที่ใช้: Premiere Pro, After Effects, CapCut, Photoshop",
+    services_h:"บริการ", services_sub:"บริการตัดต่อและอื่น ๆ ",
+    svc_video:"Long-form video", svc_video_d:"ตัดต่อวิดีโอยาวบน YouTube และใช้ฟุตเทจอ้างอิง",
+    svc_short:"Short-form video", svc_short_d:"คลิปสั้นบน TikTok พร้อมฮุกที่ดึงดูดคนดู",
+    svc_social:"Social media video", svc_social_d:"คอนเทนต์สำหรับ YouTube, TikTok, Facebook และ Instagram",
+    exp_h:"ประสบการณ์ทำงาน", edu_h:"การศึกษา",
+    job1_d:"เม.ย. 2569 – ปัจจุบัน", job1_t:"Video editor", job1_co:"ตังค์ มรรคพร",
+    job1_b1:"ตัดต่อ YouTube พอดแคสต์เล่าคดีรายการ เวรชันสูตร",
+    job1_b2:"ตัดต่อ 6 Ep. ของ All Elite Players ด้วยตัวเอง",
+    job1_b3:"ตัดคลิปสั้นบน TikTok ที่มีฮุกในไม่กี่วินาทีแรก ยอดวิวทะลุ 2 ล้าน",
+    job2_d:"ส.ค. 2568 – เม.ย. 2569", job2_t:"ครีเอเตอร์คอนเทนต์", job2_co:"TSL Asia Seri Media & KenBKK",
+    job2_b1:"ผลิตและตัดต่อคอนเทนต์สำหรับ YouTube, TikTok, Facebook และ Instagram",
+    job2_b2:"กำกับโปรเจกต์ตั้งแต่ต้นจนจบ ประสานงานกับลูกค้า วางตารางถ่ายทำ และสรุปงานหลังการผลิต",
+    edu1_t:"ปริญญาตรี เทคโนโลยีสารสนเทศและการสื่อสาร", edu1_co:"มหาวิทยาลัยศิลปากร · เกรดเฉลี่ย 3.39",
+    edu1_b:"วิทยานิพนธ์: ผู้กำกับภาพยนตร์สั้น",
+    edu2_t:"ศิลป์ภาษา", edu2_co:"Satri Rachinuthit School · เกรดเฉลี่ย 3.51",
+    contact_h:"Let's talk", contact_p:"Tell me about your video and your goals.",
+    email_h:"Email", phone_h:"Phone", line_h:"Line", line_v:"Days.17", lang_h:"ภาษา",
+    lang_v:"ไทย (เจ้าของภาษา), อังกฤษ (พื้นฐาน)",
+    avail_h:"การเริ่มงาน", avail_v:"ต้องแจ้งล่วงหน้า 30 วัน", contact_email:"ส่งอีเมลหาฉัน",
+    footer_name:"© 2026 Chanoknan Sirikupt สงวนลิขสิทธิ์"
+  }
+};
+
+/* ============ LOGIC ============ */
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+const ALL = [
+  ...YT.map(([id, t, c, f]) => ({ p: "yt", id, t: t || TITLES[id] || "", c, f })),
+  ...Object.entries(TT).flatMap(([h, ids]) => ids.split(",").map((id, i) => ({
+    p: "tt", id, t: "", c: "@" + h, f: 0,
+    img: h === "dr.tangmakkaporn" ? `assets/tt${i + 1}` : ""
+  })))
+];
+
+let lang = "en", filter = "all";
+
+function card(x) {
+  const L = T[lang], yt = x.p === "yt";
+  const url = yt ? `https://www.youtube.com/watch?v=${x.id}` : `https://www.tiktok.com/${x.c}/video/${x.id}`;
+  const label = yt ? L.watch_yt : L.watch_tt;
+  const name = yt ? (x.t || x.c) : x.c;
+  const img = yt
+    ? `<img src="https://i.ytimg.com/vi/${x.id}/hqdefault.jpg" alt="${esc(name)} thumbnail" loading="lazy" onerror="this.remove()">`
+    : (x.img ? `<img src="${x.img}.jpg" data-base="${x.img}" data-step="0" alt="TikTok cover for ${esc(x.c)}" loading="lazy" onerror="nextImg(this)">` : "");
+  const title = yt ? (x.t ? esc(x.t) : `<span class="ph">${L.ph_title}</span>`) : esc(x.c);
+  const meta = yt ? esc(x.c) : "TikTok";
+  const desc = x.f ? `<p class="desc"><span class="ph">${L.ph_desc}</span></p>` : "";
+  return `<a class="card ${yt ? "yt" : "tt"}" href="${url}" target="_blank" rel="noopener noreferrer" aria-label="${esc(label + ": " + name)} ${L.ext}">
+    <div class="thumb">${img}<span class="badge">${yt ? "YouTube" : "TikTok"}</span><span class="play" aria-hidden="true"></span></div>
+    <div class="body"><p class="meta">${meta}</p><h3>${title}</h3>${desc}<span class="cta">${label} ↗</span></div>
+  </a>`;
+}
+
+const IMG_EXTS = ["jpg", "png", "jpeg", "webp"];
+function nextImg(el) {
+  const step = Number(el.dataset.step) + 1;
+  if (step < IMG_EXTS.length) { el.dataset.step = step; el.src = el.dataset.base + "." + IMG_EXTS[step]; }
+  else el.remove();
+}
+
+const PREVIEW = 8;
+let expanded = false;
+function revealCards() {
+  document.querySelectorAll("#featGrid .card, #workGrid .card").forEach((el, i) => {
+    el.classList.add("reveal");
+    el.style.transitionDelay = (i % 4) * 90 + "ms";
+    if (io) io.observe(el); else el.classList.add("in");
+  });
+}
+function renderWork() {
+  const L = T[lang];
+  $("#featGrid").innerHTML = ALL.filter(x => x.f).map(card).join("");
+  const list = ALL.filter(x => filter === "all" || x.p === filter);
+  $("#workGrid").innerHTML = (expanded ? list : list.slice(0, PREVIEW)).map(card).join("");
+  const btn = $("#moreBtn");
+  btn.hidden = list.length <= PREVIEW;
+  btn.textContent = expanded ? L.less : L.more;
+  btn.setAttribute("aria-expanded", String(expanded));
+  revealCards();
+}
+
+function setLang(l) {
+  lang = l;
+  document.documentElement.lang = l;
+  $$("[data-i18n]").forEach(el => { const v = T[l][el.dataset.i18n]; if (v !== undefined) el.textContent = v; });
+  $$(".lang button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === l)));
+  $("#menuBtn").setAttribute("aria-label", T[l].menu);
+  renderWork();
+}
+
+$$(".lang button").forEach(b => b.addEventListener("click", () => setLang(b.dataset.lang)));
+$$("[data-filter]").forEach(b => b.addEventListener("click", () => {
+  filter = b.dataset.filter;
+  expanded = false;
+  $$("[data-filter]").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  renderWork();
+}));
+$("#moreBtn").addEventListener("click", () => { expanded = !expanded; renderWork(); });
+$("#menuBtn").addEventListener("click", () => {
+  const open = $("#nav").classList.toggle("open");
+  $("#menuBtn").setAttribute("aria-expanded", String(open));
+});
+$$("#nav a").forEach(a => a.addEventListener("click", () => {
+  $("#nav").classList.remove("open");
+  $("#menuBtn").setAttribute("aria-expanded", "false");
+}));
+
+if (CONFIG.email) {
+  $("#emailBtn").href = "mailto:" + CONFIG.email;
+  $("#emailLink").href = "mailto:" + CONFIG.email;
+}
+$("#socials").innerHTML = Object.entries(CONFIG.social).filter(([, u]) => u)
+  .map(([k, u]) => `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${k}</a>`).join("");
+
+/* Scroll reveal (skipped when reduced motion is requested) */
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const io = reduce ? null : new IntersectionObserver(entries => entries.forEach(e => {
+  if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+}), { threshold: 0.12 });
+$$(".reveal").forEach(el => io ? io.observe(el) : el.classList.add("in"));
+
+setLang("en");
+</script>
+</body>
+</html>
